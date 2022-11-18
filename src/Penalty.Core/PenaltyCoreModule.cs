@@ -52,6 +52,8 @@ namespace Penalty
         public override void PostInitialize()
         {
             IocManager.Resolve<AppTimes>().StartupTime = Clock.Now;
+            var workManager = IocManager.Resolve<IBackgroundWorkerManager>();
+            workManager.Add(IocManager.Resolve<BackGroundWorker>());
         }
     }
 }

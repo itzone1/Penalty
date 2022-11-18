@@ -3,7 +3,6 @@ using Abp.Modules;
 using Abp.Reflection.Extensions;
 using Abp.Threading.BackgroundWorkers;
 using Penalty.Authorization;
-using Penalty.worker;
 
 namespace Penalty
 {
@@ -27,11 +26,6 @@ namespace Penalty
                 // Scan the assembly for classes which inherit from AutoMapper.Profile
                 cfg => cfg.AddMaps(thisAssembly)
             );
-        }
-        public override void PostInitialize()
-        {
-            var workManager = IocManager.Resolve<IBackgroundWorkerManager>();
-            workManager.Add(IocManager.Resolve<BackGroundWorker>());
         }
     }
 }

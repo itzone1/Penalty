@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <VersionPrefix>1.0.0.0</VersionPrefix>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>Penalty.Application</AssemblyName>
+    <PackageId>Penalty.Application</PackageId>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>Penalty</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Penalty.Core\Penalty.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Penalty\Classes\RootEntities\Bets\Map\" />
+    <Folder Include="Penalty\PayMethods\Map\" />
+    <Folder Include="Penalty\PayMethods\Services\" />
+  </ItemGroup>
+</Project>

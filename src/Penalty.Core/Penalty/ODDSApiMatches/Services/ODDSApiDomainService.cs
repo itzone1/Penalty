@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace Penalty.Penalty.ODDSApiMatches.Services
 {
-    public class ODDSApiDomainService : IODDSApiDoaminService
+    public class ODDSApiDomainService : IODDSApiDomainService
     {
         private readonly IRepository<Match, Guid> _Matchrepository;
         private readonly IRepository<GeneralSettings, Guid> _generalSettingsRepository;

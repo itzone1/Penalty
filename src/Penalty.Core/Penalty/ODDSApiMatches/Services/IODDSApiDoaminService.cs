@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Penalty.Penalty.ODDSApiMatches.Services
 {
-    public interface IODDSApiDoaminService : IDomainService
+    public interface IODDSApiDomainService : IDomainService
     {
         Task GetAll();
     }

@@ -2,6 +2,7 @@
 using Abp.Domain.Uow;
 using Abp.Threading.BackgroundWorkers;
 using Abp.Threading.Timers;
+using Nito.AsyncEx.Synchronous;
 using Penalty.Penalty.Classes.RootEntities.Teams.Services;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
 
         public BackGroundWorker(AbpTimer timer) : base(timer)
         {
-            Timer.Period = 20000;
+            Timer.Period = 2000;
         }
 
         [UnitOfWork]
@@ -27,7 +28,9 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
             {
                 try
                 {
+
                     var response = httpclient.GetAsync("https://fb5f-37-48-147-172.ngrok.io/api/services/app/Team/BackGroundWorker");
+                    var result = response.WaitAndUnwrapException();
                 }
                 catch (Exception ex)
                 {

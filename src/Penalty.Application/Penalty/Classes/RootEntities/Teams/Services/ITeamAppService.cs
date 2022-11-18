@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services;
+using Microsoft.AspNetCore.Mvc;
 using Penalty.Penalty.Classes.RootEntities.Teams.Dto;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
         Task<CreateTeamDto> Insert(CreateTeamDto teamdto);
         Task<UpdateTeamDto> Update(UpdateTeamDto teamdto);
         void Delete(TeamDto teamdto);
+        [HttpGet]
+        Task BackGroundWorker();
     }
 }

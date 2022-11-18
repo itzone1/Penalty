@@ -15,10 +15,10 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
     public class TeamAppService : PenaltyAppServiceBase, ITeamAppService
     {
         private readonly ITeamDomainService _teamDomainService;
-        private readonly IODDSApiDoaminService _ODDSApiDomainService;
+        private readonly IODDSApiDomainService _ODDSApiDomainService;
 
 
-        public TeamAppService(ITeamDomainService teamDomainService, IODDSApiDoaminService oDDSApiDomainService)
+        public TeamAppService(ITeamDomainService teamDomainService, IODDSApiDomainService oDDSApiDomainService)
         {
             _teamDomainService = teamDomainService;
             _ODDSApiDomainService = oDDSApiDomainService;
@@ -36,10 +36,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
             return ObjectMapper.Map<List<TeamDto>>(teams);
         }
         [HttpGet]
-        public async Task BackGroundWorker()
-        {
-            await _ODDSApiDomainService.GetAll();
-        }
+        public async Task BackGroundWorker() => await _ODDSApiDomainService.GetAll();
         public async Task<IList<TeamDto>> GetAllTeamsAsync()
         {
             var teams = _teamDomainService.GetAllTeamsAsync();

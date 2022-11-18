@@ -13,9 +13,11 @@ using Penalty.Penalty.Indexes.Clubs;
 using Penalty.Penalty.Indexes.Countries;
 using Penalty.Penalty.Indexes.LeagueTypes;
 using Penalty.Penalty.Classes.RootEntities;
+using Abp.Domain.Repositories;
 
 namespace Penalty.EntityFrameworkCore
 {
+   
     public class PenaltyDbContext : AbpZeroDbContext<Tenant, Role, User, PenaltyDbContext>
     {
         /* Define a DbSet for each entity of the application */

@@ -14,6 +14,7 @@ using Penalty.Penalty.Indexes.Countries;
 using Penalty.Penalty.Indexes.LeagueTypes;
 using Penalty.Penalty.Classes.RootEntities;
 using Abp.Domain.Repositories;
+using Penalty.Penalty.PaySystems;
 
 namespace Penalty.EntityFrameworkCore
 {
@@ -28,6 +29,7 @@ namespace Penalty.EntityFrameworkCore
         }
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Country> Countries { get; set; }
+        public DbSet<PaySystem> PaySystems { get; set; }
         public DbSet<LeagueType> LeagueTypes { get; set; }
         public DbSet<Bet> Bets { get; set; }
         public DbSet<GeneralSettings> GeneralSettings { get; set; }

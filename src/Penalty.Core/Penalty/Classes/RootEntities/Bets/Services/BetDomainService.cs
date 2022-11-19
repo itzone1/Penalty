@@ -18,19 +18,17 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
     {
         private readonly IRepository<Bet, Guid> _repository;
         private readonly IRepository<PaySystem, Guid> _paySystemRepository;
-        private readonly PaySystemDomainService _paySystemDomainService;
         private readonly UserManager _userManager;
-        private readonly GeneralSettings _generalSettings;
+        private readonly IRepository<GeneralSettings,Guid> _generalSettingsRepository;
         private IAbpSession AbpSession { get; set; }
 
-        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, PaySystemDomainService paySystemDomainService, GeneralSettings generalSettings)
+        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository)
         {
             _repository = repository;
             _userManager = userManager;
             AbpSession = abpSession;
             _paySystemRepository = paySystemRepository;
-            _paySystemDomainService = paySystemDomainService;
-            _generalSettings = generalSettings;
+            _generalSettingsRepository = generalSettingsRepository;
         }
 
         public void Delete(Bet bet)
@@ -64,9 +62,9 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
             PaySystem paySystem = new PaySystem()
             {
-                MerchantUrl = _generalSettings.MerchantUrl,
-                m_shop = _generalSettings.MerchantShop,
-                m_key = _generalSettings.MerchantSecretKey,
+                MerchantUrl = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantUrl,
+                m_shop = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantShop,
+                m_key = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantSecretKey,
                 m_amount = bet.BetBalance,
                 m_curr = "USD",
                 m_desc = "",

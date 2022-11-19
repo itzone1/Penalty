@@ -15,12 +15,12 @@ namespace Penalty.Penalty.PaySystems.Services
 {
     public class PaySystemDomainService : IPaySystemDomainService
     {
-        private readonly IRepository<PaySystem, Guid> _repository;
+        private readonly IRepository<PaySystem, Guid> _paySystemRepository;
         private readonly IRepository<Bet, Guid> _Betrepository;
 
-        public PaySystemDomainService(IRepository<PaySystem, Guid> repository)
+        public PaySystemDomainService(IRepository<PaySystem, Guid> paySystemRepository)
         {
-            _repository = repository;
+            _paySystemRepository = paySystemRepository;
         }
 
         public string AddNewPayment(PaySystem paySystem)
@@ -42,14 +42,14 @@ namespace Penalty.Penalty.PaySystems.Services
         public string GenerateUrl(PaySystem paySystem)
         {
             var orderId = 1;
-            var payments = _repository.GetAll();
+            var payments = _paySystemRepository.GetAll();
             if (payments != null)
             {
                 orderId = payments.Select(x => x.m_orderid).LastOrDefault();
             }
             paySystem.m_orderid = orderId;
             paySystem.isCompleted = false;
-            _repository.InsertOrUpdate(paySystem);
+            _paySystemRepository.InsertOrUpdate(paySystem);
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append(paySystem.MerchantUrl);
             stringBuilder.Append("/?m_shop=");
@@ -69,7 +69,7 @@ namespace Penalty.Penalty.PaySystems.Services
             stringBuilder.Append(newsign);
             stringBuilder.Append("&lang=en");
             paySystem.sign = newsign;
-            _repository.InsertOrUpdateAsync(paySystem);
+            _paySystemRepository.InsertOrUpdateAsync(paySystem);
 
             return stringBuilder.ToString();
         }

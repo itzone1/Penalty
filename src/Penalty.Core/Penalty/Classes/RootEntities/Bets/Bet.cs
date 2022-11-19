@@ -3,6 +3,7 @@ using Penalty.Authorization.Users;
 using Penalty.Penalty.Classes.Entities.Matches;
 using Penalty.Penalty.Enums;
 using Penalty.Penalty.PayMethods;
+using Penalty.Penalty.PaySystems;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -35,5 +36,9 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets
         public DateTime BettingDate { get; set; }
         public BetStatus BetStatus { get; set; }
         public string? Description { get; set; }
+        public bool isPaid { get; set; }
+        [ForeignKey("PaySystem")]
+        public Guid PaySystemId { get; set; }
+        public PaySystem PaySystem { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Penalty.Penalty.Classes.RootEntities.Teams;
 using Penalty.Penalty.Classes.RootEntities.Teams.Dto;
 using Penalty.Penalty.Indexes.LeagueTypes;
+using Penalty.Penalty.Indexes.LeagueTypes.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace Penalty.Penalty.Classes.RootEntities.Leagues.Dto
     public class LeagueDto : EntityDto<Guid>
     {
         public string Name { get; set; }
+        public string LeagueApiKey { get; set; }
         public Guid LeagueTypeId { get; set; }
+        public LeagueTypeDto LeagueType { get; set; }
         public IList<TeamDto> Teams { get; set; }
         public LeagueDto()
         {

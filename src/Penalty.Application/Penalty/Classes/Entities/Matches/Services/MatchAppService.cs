@@ -9,23 +9,50 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Abp.Authorization;
 using Penalty.Authorization;
+using Penalty.Penalty.Classes.RootEntities.Teams.Services;
+using Penalty.Penalty.Classes.RootEntities.Leagues.Services;
+using Penalty.Penalty.Classes.RootEntities.Leagues.Dto;
+using Penalty.Penalty.Classes.RootEntities.Leagues;
 
 namespace Penalty.Penalty.Classes.Entities.Matches.Services
 {
     public class MatchAppService : PenaltyAppServiceBase, IMatchAppService
     {
         private readonly IMatchDomainService _matchDomainService;
+        private readonly ITeamDomainService _teamDomainService;
+        private readonly ILeagueDomainService _leagueDomainService;
 
-        public MatchAppService(IMatchDomainService matchDomainService)
+        public MatchAppService(IMatchDomainService matchDomainService, ITeamDomainService teamDomainService, ILeagueDomainService leagueDomainService)
         {
             _matchDomainService = matchDomainService;
+            _teamDomainService = teamDomainService;
+            _leagueDomainService = leagueDomainService;
         }
         [AbpAuthorize(PermissionNames.Pages_Users_Activation)]
-        public void Delete(MatchDto matchdto)
+        public void Delete(Guid id)
         {
-            var match = ObjectMapper.Map<Match>(matchdto);
-            _matchDomainService.Delete(match);
+            _matchDomainService.Delete(id);
         }
+
+        public IList<LeagueDto> GetLeagueLookup()
+        {
+            var leagues = _leagueDomainService.GetAll();
+            var newLeagues = new List<LeagueDto>();
+            ObjectMapper.Map<IList<League>, List<LeagueDto>>(leagues, newLeagues);
+
+            return newLeagues;
+        }
+
+        public IList<TeamDto> GetTeamLookup()
+        {
+            var teams = _teamDomainService.GetAll();
+            var newTeams = new List<TeamDto>();
+            ObjectMapper.Map<IList<Team>, List<TeamDto>>(teams, newTeams);
+
+            return newTeams;
+        }
+        
+
         public IList<MatchDto> GetAll()
         {
             var matches = _matchDomainService.GetAll();

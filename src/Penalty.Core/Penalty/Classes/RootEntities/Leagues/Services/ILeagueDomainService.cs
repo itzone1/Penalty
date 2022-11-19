@@ -15,6 +15,6 @@ namespace Penalty.Penalty.Classes.RootEntities.Leagues.Services
         Task<League> GetbyId(Guid id);
         Task<League> Insert(League league);
         Task<League> Update(League league);
-        void Delete(League league);
+        void Delete(Guid id);
     }
 }

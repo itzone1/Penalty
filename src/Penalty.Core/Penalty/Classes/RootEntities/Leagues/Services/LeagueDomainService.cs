@@ -16,9 +16,9 @@ namespace Penalty.Penalty.Classes.RootEntities.Leagues.Services
             _repository = repository;
         }
 
-        public void Delete(League league)
+        public void Delete(Guid id)
         {
-           _repository.Delete(league);
+           _repository.Delete(id);
         }
 
         public IList<League> GetAll()

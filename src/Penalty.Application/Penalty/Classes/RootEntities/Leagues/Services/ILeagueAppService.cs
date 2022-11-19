@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services;
 using Penalty.Penalty.Classes.RootEntities.Leagues.Dto;
 using Penalty.Penalty.Classes.RootEntities.Teams.Dto;
+using Penalty.Penalty.Indexes.LeagueTypes.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Leagues.Services
         Task<LeagueDto> GetbyId(Guid id);
         Task<CreateLeagueDto> Insert(CreateLeagueDto leagueDto);
         Task<UpdateLeagueDto> Update(UpdateLeagueDto leagueDto);
-        void Delete(LeagueDto leagueDto);
+        void Delete(Guid id);
+        IList<LeagueTypeDto> GetLeagueTypeLookup();
     }
 }

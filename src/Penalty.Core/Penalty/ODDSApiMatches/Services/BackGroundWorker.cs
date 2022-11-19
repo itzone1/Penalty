@@ -18,7 +18,7 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
 
         public BackGroundWorker(AbpTimer timer) : base(timer)
         {
-            Timer.Period = 2000;
+            Timer.Period = 3600000;
         }
 
         [UnitOfWork]

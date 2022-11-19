@@ -1,5 +1,6 @@
 ﻿using Abp.Application.Services;
 using Penalty.Penalty.Classes.Entities.Matches.Dto;
+using Penalty.Penalty.Classes.RootEntities.Leagues.Dto;
 using Penalty.Penalty.Classes.RootEntities.Teams.Dto;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
         Task<MatchDto> GetbyId(Guid id);
         Task<CreateMatchDto> Insert(CreateMatchDto matchdto);
         Task<UpdateMatchDto> Update(UpdateMatchDto matchdto);
-        void Delete(MatchDto matchdto);
+        void Delete(Guid id );
+        IList<LeagueDto> GetLeagueLookup();
+        IList<TeamDto> GetTeamLookup();
     }
 }

@@ -18,6 +18,6 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
         Task<Match> GetbyId(Guid id);
         Task<Match> Insert(Match match);
         Task<Match> Update(Match match);
-        void Delete(Match match);
+        void Delete(Guid id);
     }
 }

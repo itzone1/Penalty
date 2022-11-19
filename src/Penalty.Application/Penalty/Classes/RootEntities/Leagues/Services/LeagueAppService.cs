@@ -8,23 +8,37 @@ using System.Text;
 using System.Threading.Tasks;
 using Abp.Authorization;
 using Penalty.Authorization;
+using Penalty.Penalty.Indexes.LeagueTypes.Dto;
+using Penalty.Penalty.Indexes.LeagueTypes;
+using Penalty.Penalty.Indexes.LeagueTypes.Services;
 
 namespace Penalty.Penalty.Classes.RootEntities.Leagues.Services
 {
     public class LeagueAppService : PenaltyAppServiceBase, ILeagueAppService
     {
         private readonly ILeagueDomainService _leagueDomainService;
+        private readonly ILeagueTypeDomainService _leagueTypeDomainService;
 
-        public LeagueAppService(ILeagueDomainService leagueDomainService)
+        public LeagueAppService(ILeagueDomainService leagueDomainService, ILeagueTypeDomainService leagueTypeDomainService)
         {
             _leagueDomainService = leagueDomainService;
+            _leagueTypeDomainService = leagueTypeDomainService;
         }
         [AbpAuthorize(PermissionNames.Pages_Users_Activation)]
-        public void Delete(LeagueDto leagueDto)
+        public void Delete(Guid id)
         {
-            var league = ObjectMapper.Map<League>(leagueDto);
-            _leagueDomainService.Delete(league);
+            _leagueDomainService.Delete(id);
         }
+
+        public IList<LeagueTypeDto> GetLeagueTypeLookup()
+        {
+            var leagueTypes = _leagueTypeDomainService.GetAll();
+            var newLeagueTypes = new List<LeagueTypeDto>();
+            ObjectMapper.Map<IList<LeagueType>, List<LeagueTypeDto>>(leagueTypes, newLeagueTypes);
+
+            return newLeagueTypes;
+        }
+
 
         public IList<LeagueDto> GetAll()
         {

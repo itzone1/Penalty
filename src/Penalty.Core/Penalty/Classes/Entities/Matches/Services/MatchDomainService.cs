@@ -16,9 +16,9 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
             _repository = repository;
         }
 
-        public void Delete(Match match)
+        public void Delete(Guid id)
         {
-            _repository.Delete(match);
+            _repository.Delete(id);
         }
 
         public IList<Match> GetAll()

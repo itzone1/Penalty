@@ -2,6 +2,8 @@
 using Abp.Runtime.Session;
 using Abp.UI;
 using Penalty.Authorization.Users;
+using Penalty.Penalty.PaySystems;
+using Penalty.Penalty.PaySystems.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,14 +17,20 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
     public class BetDomainService : IBetDomainService
     {
         private readonly IRepository<Bet, Guid> _repository;
+        private readonly IRepository<PaySystem, Guid> _paySystemRepository;
+        private readonly PaySystemDomainService _paySystemDomainService;
         private readonly UserManager _userManager;
+        private readonly GeneralSettings _generalSettings;
         private IAbpSession AbpSession { get; set; }
 
-        public BetDomainService(IRepository<Bet, Guid> repository,UserManager userManager,IAbpSession abpSession)
+        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, PaySystemDomainService paySystemDomainService, GeneralSettings generalSettings)
         {
             _repository = repository;
             _userManager = userManager;
             AbpSession = abpSession;
+            _paySystemRepository = paySystemRepository;
+            _paySystemDomainService = paySystemDomainService;
+            _generalSettings = generalSettings;
         }
 
         public void Delete(Bet bet)
@@ -53,6 +61,22 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             {
                 bet.User = _userManager.GetUserById((long)AbpSession.UserId);
             }
+
+            PaySystem paySystem = new PaySystem()
+            {
+                MerchantUrl = _generalSettings.MerchantUrl,
+                m_shop = _generalSettings.MerchantShop,
+                m_key = _generalSettings.MerchantSecretKey,
+                m_amount = bet.BetBalance,
+                m_curr = "USD",
+                m_desc = "",
+                m_orderid = 12345
+            };
+
+            await _paySystemRepository.InsertAsync(paySystem);
+            bet.PaySystemId = paySystem.Id;
+            bet.PaySystem = paySystem;
+
             return await _repository.InsertAsync(bet);
         }
 

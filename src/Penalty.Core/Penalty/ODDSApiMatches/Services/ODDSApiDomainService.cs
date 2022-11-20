@@ -4,6 +4,7 @@ using Abp.Domain.Uow;
 using Abp.Threading.BackgroundWorkers;
 using Abp.Threading.Timers;
 using Abp.Timing;
+using Penalty.Authorization.Users;
 using Penalty.Penalty.Classes.Entities.Matches;
 using Penalty.Penalty.Classes.Entities.MatchResults;
 using Penalty.Penalty.Classes.RootEntities;
@@ -63,29 +64,32 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
                         foreach (var oddsMatch in oDDSMatch)
                         {
                             var resExist = matchReses.Where(x => x.MatchId == Guid.Parse(oddsMatch.Id)).Count()>0;
-                            var match = new Match()
-                            {
-                                Id = Guid.Parse(oddsMatch.Id),
-                                Name = oddsMatch.HomeTeam + " - " + oddsMatch.AwayTeam,
-                                AwayTeam = teams.FirstOrDefault(x => x.Name == oddsMatch.AwayTeam),
+                        var match = new Match()
+                        {
+                            Id = Guid.Parse(oddsMatch.Id),
+                            Name = oddsMatch.HomeTeam + " - " + oddsMatch.AwayTeam,
+                            AwayTeam = teams.FirstOrDefault(x => x.Name == oddsMatch.AwayTeam),
+                            AwayTeamId = teams.FirstOrDefault(x => x.Name == oddsMatch.AwayTeam).Id,
                                 HomeTeam = teams.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam),
-                                League = leagues.FirstOrDefault(x => x.LeagueApiKey == SportName),
+                            HomeTeamId = teams.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam).Id,
+                            League = leagues.FirstOrDefault(x => x.LeagueApiKey == SportName),
                                 ODD = generalSettings.DefaultODD,
                                 ExpectedEndingTime = oddsMatch.CommenceTime.AddMinutes(105),
                                 MatchDate = oddsMatch.CommenceTime,
                                 StartingTime = oddsMatch.CommenceTime,
                                 MatchStatus = oddsMatch.Completed ? Enums.MatchStatus.Finished : oddsMatch.CommenceTime < DateTime.Now ? Enums.MatchStatus.Pending : Enums.MatchStatus.NotStarted,
                             };
-                            _Matchrepository.InsertOrUpdate(match);
+                             await _Matchrepository.InsertOrUpdateAsync(match);
+                        
                             if (match.MatchStatus == Enums.MatchStatus.Finished && !resExist)
                             {
                                 var matchRes = new MatchResult()
                                 {
-                                    AwayTeamScore = oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.AwayTeam).TeamScore,
-                                    HomeTeamScore = oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.HomeTeam).TeamScore,
+                                    AwayTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.AwayTeam).TeamScore),
+                                    HomeTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.HomeTeam).TeamScore),
                                     Match = match,
                                 };
-                                _MatchResultrepository.Insert(matchRes);
+                               await _MatchResultrepository.InsertAsync(matchRes);
                             }
                         }
                     }

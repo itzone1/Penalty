@@ -25,27 +25,27 @@ namespace Penalty.Penalty.InvitationLinks.Services
             AbpSession = abpSession;
         }
 
-        public string GenerateUserInvitationLink()
+        public async Task<string> GenerateUserInvitationLink()
         {
             var settings = _generalSettingsRepository.GetAll().FirstOrDefault();
             InvitationLink invitationLink = new InvitationLink()
             {
                 User = _userManager.GetUserById((long)AbpSession.UserId),
                 UserId = (long)AbpSession.UserId,
-                GeneratedUrl = settings.WebsiteDeafultLink + "?id=" + (long)AbpSession.UserId
+                GeneratedUrl = settings.WebsiteDeafultLink + "/registerinvitelink?id=" + (long)AbpSession.UserId
             };
-            _repository.InsertOrUpdate(invitationLink);
+            await _repository.InsertOrUpdateAsync(invitationLink);
             return invitationLink.GeneratedUrl;
         }
 
-        public string GetUserInvitationLink()
+        public async Task<string> GetUserInvitationLink()
         {
             var Link = _repository.GetAll().Where(x => x.UserId == AbpSession.UserId).Select(x => x.GeneratedUrl).FirstOrDefault();
             if(Link == null || Link == String.Empty)
             {
-                return GenerateUserInvitationLink();
+                return await GenerateUserInvitationLink();
             }
-            return Link;
+            return  Link;
         }
     }
 }

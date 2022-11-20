@@ -9,5 +9,6 @@ namespace Penalty.Penalty.InvitationLinks.Services
 {
     public interface IInvitationLinkAppService : IApplicationService
     {
+        public Task<string> GetUserInvitationLink();
     }
 }

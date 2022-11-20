@@ -9,7 +9,7 @@ namespace Penalty.Penalty.InvitationLinks.Services
 {
     public interface IInvitationLinkDomainService : IDomainService
     {
-        public string GetUserInvitationLink();
-        public string GenerateUserInvitationLink();
+        public Task<string> GetUserInvitationLink();
+        public Task<string> GenerateUserInvitationLink();
     }
 }

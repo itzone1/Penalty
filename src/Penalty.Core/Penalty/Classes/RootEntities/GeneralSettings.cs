@@ -14,5 +14,6 @@ namespace Penalty.Penalty.Classes.RootEntities
         public string MerchantUrl { get; set; }
         public int MerchantShop { get; set; }
         public string MerchantSecretKey { get; set; }
+        public string WebsiteDeafultLink { get; set; }
     }
 }

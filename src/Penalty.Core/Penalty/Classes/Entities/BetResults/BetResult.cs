@@ -22,10 +22,10 @@ namespace Penalty.Penalty.Classes.Entities.BetResults
         public MatchResult MatchResult { get; set; }
         public double DeservedBalance
         {
-            get
-            {
-                return Bet.BetBalance * Bet.Match.ODD;
-            }
+            get;set;
+            //{
+            //    return Bet.BetBalance * Bet.Match.ODD;
+            //}
         }
         public bool isPaid { get; set; }
         public string? Description { get; set; }

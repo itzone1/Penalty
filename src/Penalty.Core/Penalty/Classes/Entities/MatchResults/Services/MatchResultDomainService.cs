@@ -1,8 +1,13 @@
 ﻿using Abp.Domain.Repositories;
+using Abp.Runtime.Session;
+using Penalty.Authorization.Users;
 using Penalty.Penalty.Classes.Entities.BetResults;
 using Penalty.Penalty.Classes.Entities.BetResults.Services;
+using Penalty.Penalty.Classes.Entities.Matches;
 using Penalty.Penalty.Classes.Entities.Matches.Services;
+using Penalty.Penalty.Classes.RootEntities;
 using Penalty.Penalty.Classes.RootEntities.Bets.Services;
+using Penalty.Penalty.InvitedUsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,17 +23,30 @@ namespace Penalty.Penalty.Classes.Entities.MatchResults.Services
         private readonly BetResultDomainService _betResultDomainService;
         private readonly MatchDomainService _matchDomainService;
 
+        private readonly IRepository<GeneralSettings, Guid> _GeneralSettingsrepository;
+        private readonly IRepository<InvitedUser, Guid> _InvitedRepository;
+        private IAbpSession abpSession;
+        private readonly UserManager _userManager;
+
         public MatchResultDomainService(
             IRepository<MatchResult, Guid> repository,
             BetDomainService betDomainService,
             BetResultDomainService betResultDomainService,
-            MatchDomainService matchDomainService
+            MatchDomainService matchDomainService, 
+            IRepository<GeneralSettings,Guid> generalSettingsrepository,
+            IRepository<InvitedUser, Guid> invitedRepository,
+            IAbpSession abpSession,
+            UserManager userManager
             )
         {
             _repository = repository;
             _betDomainService = betDomainService;
             _betResultDomainService = betResultDomainService;
             _matchDomainService = matchDomainService;
+            _GeneralSettingsrepository = generalSettingsrepository;
+            _InvitedRepository = invitedRepository;
+            this.abpSession = abpSession;
+            _userManager = userManager;
         }
 
         public void Delete(MatchResult matchResult)
@@ -88,6 +106,7 @@ namespace Penalty.Penalty.Classes.Entities.MatchResults.Services
                 betResult.BetId = bet.Id;
                 betResult.MatchResult = matchResult;
                 betResult.MatchResultId = matchResult.Id;
+                betResult.DeservedBalance = bet.BetBalance *  GetDeservableODD(matchResult.Match);
                 if(isWon)
                 {
                     betResult.Result = Enums.Result.WonBet;
@@ -100,6 +119,15 @@ namespace Penalty.Penalty.Classes.Entities.MatchResults.Services
                 await _betDomainService.Update(bet);
                 await _betResultDomainService.Insert(betResult);
             }
+
+        }
+        private double GetDeservableODD(Match match)
+        {
+            double newODD = 0;
+            var ODDsettings = _GeneralSettingsrepository.GetAll().Select(x => x.DefaultODD).FirstOrDefault();
+            int numberOfInvitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)abpSession.UserId).Count();
+            newODD = match.ODD + (ODDsettings * numberOfInvitedUsers);
+            return newODD;
         }
     }
 }

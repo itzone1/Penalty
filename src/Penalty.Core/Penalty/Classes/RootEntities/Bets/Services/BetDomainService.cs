@@ -2,6 +2,7 @@
 using Abp.Runtime.Session;
 using Abp.UI;
 using Penalty.Authorization.Users;
+using Penalty.Penalty.InvitedUsers;
 using Penalty.Penalty.PaySystems;
 using Penalty.Penalty.PaySystems.Services;
 using System;
@@ -21,14 +22,16 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
         private readonly UserManager _userManager;
         private readonly IRepository<GeneralSettings,Guid> _generalSettingsRepository;
         private IAbpSession AbpSession { get; set; }
+        private readonly IRepository<InvitedUser, Guid> _InvitedUsersRepository;
 
-        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository)
+        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository, IRepository<InvitedUser, Guid> invitedUsersRepository)
         {
             _repository = repository;
             _userManager = userManager;
             AbpSession = abpSession;
             _paySystemRepository = paySystemRepository;
             _generalSettingsRepository = generalSettingsRepository;
+            _InvitedUsersRepository = invitedUsersRepository;
         }
 
         public void Delete(Bet bet)
@@ -53,6 +56,13 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
         public async Task<Bet> Insert(Bet bet)
         {
+            var currentUser = _userManager.GetUserById((long)AbpSession.UserId);
+            var isInvited = _InvitedUsersRepository.GetAllIncluding(x => x.User).FirstOrDefault(x => x.UserId == currentUser.Id && x.isActivated == false) ;
+            if (isInvited != null)
+            {
+                isInvited.isActivated = true;
+                await _InvitedUsersRepository.UpdateAsync(isInvited);
+            }
             bet.BettingDate = DateTime.Now;
             bet.BetStatus = Enums.BetStatus.Pending;
             if (AbpSession.UserId != null)

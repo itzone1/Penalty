@@ -1,6 +1,7 @@
 ﻿using Abp.Dependency;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
+using Abp.EntityFrameworkCore.Repositories;
 using Abp.Threading.BackgroundWorkers;
 using Abp.Threading.Timers;
 using Abp.Timing;
@@ -49,50 +50,60 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
                     var leagues = _Leaguesrepository.GetAll();
                     var matchReses = _MatchResultrepository.GetAll();
                     List<ODDSMatch> oDDSMatch = new List<ODDSMatch>();
-                    foreach (var leagueKey in Sportnames)
+                foreach (var leagueKey in Sportnames)
+                {
+                    string SportName = leagueKey;
+                    using (var _httpClient = new HttpClient())
                     {
-                        string SportName = leagueKey;
-                        using (var _httpClient = new HttpClient())
-                        {
 
-                            var res = await _httpClient.GetAsync("https://api.the-odds-api.com" + "/v4/sports/" + SportName + "/scores/?apiKey=" + generalSettings.ApiKey + "&daysFrom=3&dateFormat=iso");
-                            var JsonResponse = await res.Content.ReadAsStringAsync();
-                            oDDSMatch = JsonSerializer.Deserialize<List<ODDSMatch>>(JsonResponse);
+                        var res = await _httpClient.GetAsync("https://api.the-odds-api.com" + "/v4/sports/" + SportName + "/scores/?apiKey=" + generalSettings.ApiKey + "&daysFrom=3&dateFormat=iso");
+                        var JsonResponse = await res.Content.ReadAsStringAsync();
+                        oDDSMatch = JsonSerializer.Deserialize<List<ODDSMatch>>(JsonResponse);
 
 
-                        };
-                        foreach (var oddsMatch in oDDSMatch)
-                        {
-                            var resExist = matchReses.Where(x => x.MatchId == Guid.Parse(oddsMatch.Id)).Count()>0;
+                    };
+                    foreach (var oddsMatch in oDDSMatch)
+                    {
+                        var resExist = matchReses.Where(x => x.MatchId == Guid.Parse(oddsMatch.Id)).Count() > 0;
                         var match = new Match()
                         {
                             Id = Guid.Parse(oddsMatch.Id),
                             Name = oddsMatch.HomeTeam + " - " + oddsMatch.AwayTeam,
                             AwayTeam = teams.FirstOrDefault(x => x.Name == oddsMatch.AwayTeam),
                             AwayTeamId = teams.FirstOrDefault(x => x.Name == oddsMatch.AwayTeam).Id,
-                                HomeTeam = teams.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam),
+                            HomeTeam = teams.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam),
                             HomeTeamId = teams.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam).Id,
                             League = leagues.FirstOrDefault(x => x.LeagueApiKey == SportName),
-                                ODD = generalSettings.DefaultODD,
-                                ExpectedEndingTime = oddsMatch.CommenceTime.AddMinutes(105),
-                                MatchDate = oddsMatch.CommenceTime,
-                                StartingTime = oddsMatch.CommenceTime,
-                                MatchStatus = oddsMatch.Completed ? Enums.MatchStatus.Finished : oddsMatch.CommenceTime < DateTime.Now ? Enums.MatchStatus.Pending : Enums.MatchStatus.NotStarted,
-                            };
-                             await _Matchrepository.InsertOrUpdateAsync(match);
-                        
-                            if (match.MatchStatus == Enums.MatchStatus.Finished && !resExist)
+                            LeagueId = leagues.FirstOrDefault(x => x.LeagueApiKey == SportName).Id,
+                            ODD = generalSettings.DefaultODD,
+                            ExpectedEndingTime = oddsMatch.CommenceTime.AddMinutes(105),
+                            MatchDate = oddsMatch.CommenceTime,
+                            StartingTime = oddsMatch.CommenceTime,
+                            MatchStatus = oddsMatch.Completed ? Enums.MatchStatus.Finished : oddsMatch.CommenceTime < DateTime.Now ? Enums.MatchStatus.Pending : Enums.MatchStatus.NotStarted,
+                        };
+                        var matchExist = _Matchrepository.GetAll().Where(x => x.Id == Guid.Parse(oddsMatch.Id)).Count() > 0;
+                        if (matchExist)
+                        {
+                            await _Matchrepository.UpdateAsync(match);
+                        }
+                        else
+                        {
+                            await _Matchrepository.InsertAsync(match);
+                        }
+
+                        if (match.MatchStatus == Enums.MatchStatus.Finished && !resExist)
+                        {
+                            var matchRes = new MatchResult()
                             {
-                                var matchRes = new MatchResult()
-                                {
-                                    AwayTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.AwayTeam).TeamScore),
-                                    HomeTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.HomeTeam).TeamScore),
-                                    Match = match,
-                                };
-                               await _MatchResultrepository.InsertAsync(matchRes);
-                            }
+                                AwayTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.AwayTeam).TeamScore),
+                                HomeTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.HomeTeam).TeamScore),
+                                Match = match,
+                            };
+                            await _MatchResultrepository.InsertAsync(matchRes);
                         }
                     }
+                }
+
             }
             catch (Exception ex)
             {

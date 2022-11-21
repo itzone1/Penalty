@@ -17,10 +17,9 @@ namespace Penalty.Penalty.PaySystems.Services
             _paySystemDomainService = paySystemDomainService;
         }
 
-        public string AddNewPayment(CreatePaySystemDto paySystem)
+        public async Task<string> AddNewPayment(Guid BetId)
         {
-            var ps = ObjectMapper.Map<PaySystem>(paySystem);
-            var createdUrl = _paySystemDomainService.AddNewPayment(ps);
+            var createdUrl = await _paySystemDomainService.AddNewPayment(BetId);
             return createdUrl;
         }
     }

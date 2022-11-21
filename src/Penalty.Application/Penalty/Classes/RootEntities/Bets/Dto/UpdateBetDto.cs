@@ -16,5 +16,6 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Dto
         public double BetBalance { get; set; }
         public DateTime BettingDate { get; set; }
         public string? Description { get; set; }
+
     }
 }

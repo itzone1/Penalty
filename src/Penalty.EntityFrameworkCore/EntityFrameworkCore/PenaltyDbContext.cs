@@ -15,6 +15,8 @@ using Penalty.Penalty.Indexes.LeagueTypes;
 using Penalty.Penalty.Classes.RootEntities;
 using Abp.Domain.Repositories;
 using Penalty.Penalty.PaySystems;
+using Penalty.Penalty.InvitationLinks;
+using Penalty.Penalty.InvitedUsers;
 
 namespace Penalty.EntityFrameworkCore
 {
@@ -38,5 +40,7 @@ namespace Penalty.EntityFrameworkCore
         public DbSet<BetResult> BetResults { get; set; }
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchResult> MatchResults { get; set; }
+        public DbSet<InvitationLink> InvitationLinks { get; set; }
+        public DbSet<InvitedUser> InvitedUsers { get; set; }
     }
 }

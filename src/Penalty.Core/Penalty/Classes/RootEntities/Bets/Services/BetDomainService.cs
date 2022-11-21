@@ -1,7 +1,9 @@
 ﻿using Abp.Domain.Repositories;
+using Abp.EntityFrameworkCore.Repositories;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Penalty.Authorization.Users;
+using Penalty.Penalty.InvitedUsers;
 using Penalty.Penalty.PaySystems;
 using Penalty.Penalty.PaySystems.Services;
 using System;
@@ -21,14 +23,18 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
         private readonly UserManager _userManager;
         private readonly IRepository<GeneralSettings,Guid> _generalSettingsRepository;
         private IAbpSession AbpSession { get; set; }
+        private readonly IRepository<InvitedUser, Guid> _InvitedUsersRepository;
+        private readonly IPaySystemDomainService _paySystemDomainService;
 
-        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository)
+        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository, IRepository<InvitedUser, Guid> invitedUsersRepository, IPaySystemDomainService paySystemDomainService)
         {
             _repository = repository;
             _userManager = userManager;
             AbpSession = abpSession;
             _paySystemRepository = paySystemRepository;
             _generalSettingsRepository = generalSettingsRepository;
+            _InvitedUsersRepository = invitedUsersRepository;
+            _paySystemDomainService = paySystemDomainService;
         }
 
         public void Delete(Bet bet)
@@ -38,21 +44,43 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
         public IList<Bet> GetAll()
         {
-            return _repository.GetAllIncluding(x=>x.Match,x=> x.Match.League,x=> x.Match.HomeTeam,x=>x.Match.AwayTeam,x=>x.PayMethod,x=>x.User).ToList();
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach(var bet in bets)
+            {
+                _paySystemDomainService.CheckPayment(bet.Id);
+            }
+            return bets;
         }
 
         public async Task<IList<Bet>> GetAllBetsAsync()
         {
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach (var bet in bets)
+            {
+               await _paySystemDomainService.CheckPayment(bet.Id);
+            }
             return await _repository.GetAllListAsync();
         }
 
         public async Task<Bet> GetbyId(Guid id)
         {
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach (var bet in bets)
+            {
+               await _paySystemDomainService.CheckPayment(bet.Id);
+            }
             return _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<Bet> Insert(Bet bet)
         {
+            var currentUser = _userManager.GetUserById((long)AbpSession.UserId);
+            var isInvited = _InvitedUsersRepository.GetAllIncluding(x => x.User).FirstOrDefault(x => x.UserId == currentUser.Id && x.isActivated == false) ;
+            if (isInvited != null)
+            {
+                isInvited.isActivated = true;
+                await _InvitedUsersRepository.UpdateAsync(isInvited);
+            }
             bet.BettingDate = DateTime.Now;
             bet.BetStatus = Enums.BetStatus.Pending;
             if (AbpSession.UserId != null)
@@ -62,17 +90,28 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
             PaySystem paySystem = new PaySystem()
             {
+                User = bet.User,
+                UserId = bet.UserId,
                 MerchantUrl = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantUrl,
                 m_shop = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantShop,
                 m_key = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantSecretKey,
                 m_amount = bet.BetBalance,
                 m_curr = "USD",
                 m_desc = "",
-                m_orderid = 12345
+                m_orderid = 12345,
+                sign = "",
+                isCompleted = false,
             };
 
-            await _paySystemRepository.InsertAsync(paySystem);
-            bet.PaySystemId = paySystem.Id;
+            var payId = await _paySystemRepository.InsertAndGetIdAsync(paySystem);
+            try
+            {
+                await _paySystemRepository.GetDbContext().SaveChangesAsync();
+            }catch(Exception ex)
+            {
+
+            }
+            bet.PaySystemId = payId;
             bet.PaySystem = paySystem;
 
             return await _repository.InsertAsync(bet);
@@ -89,6 +128,11 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
         public  IList<Bet> GetUserBets()
         {
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach (var bet in bets)
+            {
+                _paySystemDomainService.CheckPayment(bet.Id);
+            }
             return _repository.GetAllIncluding(x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam).Where(x => x.User.Id == AbpSession.UserId).ToList();
         }
     }

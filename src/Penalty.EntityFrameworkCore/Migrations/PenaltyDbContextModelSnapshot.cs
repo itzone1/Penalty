@@ -1655,6 +1655,9 @@ namespace Penalty.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("DeservedBalance")
+                        .HasColumnType("float");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1884,6 +1887,9 @@ namespace Penalty.Migrations
                     b.Property<string>("ApiKey")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ApiPass")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
@@ -1908,6 +1914,12 @@ namespace Penalty.Migrations
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("MainAccount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MerchantSecretKey")
                         .HasColumnType("nvarchar(max)");
 
@@ -1915,6 +1927,9 @@ namespace Penalty.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("MerchantUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WebsiteDeafultLink")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -2122,6 +2137,91 @@ namespace Penalty.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LeagueTypes");
+                });
+
+            modelBuilder.Entity("Penalty.Penalty.InvitationLinks.InvitationLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GeneratedUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("InvitationLinks");
+                });
+
+            modelBuilder.Entity("Penalty.Penalty.InvitedUsers.InvitedUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("InvitedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("isActivated")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvitedByUserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("InvitedUsers");
                 });
 
             modelBuilder.Entity("Penalty.Penalty.PayMethods.PayMethod", b =>
@@ -2593,6 +2693,36 @@ namespace Penalty.Migrations
                     b.Navigation("Club");
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Penalty.Penalty.InvitationLinks.InvitationLink", b =>
+                {
+                    b.HasOne("Penalty.Authorization.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Penalty.Penalty.InvitedUsers.InvitedUser", b =>
+                {
+                    b.HasOne("Penalty.Authorization.Users.User", "InvitedByUser")
+                        .WithMany()
+                        .HasForeignKey("InvitedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Penalty.Authorization.Users.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InvitedByUser");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Penalty.Penalty.PayMethods.PayMethod", b =>

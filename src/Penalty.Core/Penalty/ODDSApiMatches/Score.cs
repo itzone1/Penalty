@@ -12,6 +12,6 @@ namespace Penalty.Penalty.ODDSApiMatches
         [JsonPropertyName("name")]
         public string TeamName { get; set; }
         [JsonPropertyName("score")]
-        public int TeamScore { get; set; }
+        public string TeamScore { get; set; }
     }
 }

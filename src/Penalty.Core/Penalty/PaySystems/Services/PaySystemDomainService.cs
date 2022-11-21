@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Abp.Domain.Repositories;
 using Penalty.Penalty.Classes.RootEntities.Bets;
+using System.Linq.Dynamic.Core;
 
 namespace Penalty.Penalty.PaySystems.Services
 {
@@ -18,19 +19,23 @@ namespace Penalty.Penalty.PaySystems.Services
         private readonly IRepository<PaySystem, Guid> _paySystemRepository;
         private readonly IRepository<Bet, Guid> _Betrepository;
 
-        public PaySystemDomainService(IRepository<PaySystem, Guid> paySystemRepository)
+        public PaySystemDomainService(IRepository<PaySystem, Guid> paySystemRepository, IRepository<Bet, Guid> betrepository)
         {
             _paySystemRepository = paySystemRepository;
+            _Betrepository = betrepository;
         }
 
-        public string AddNewPayment(PaySystem paySystem)
+        public async Task<string> AddNewPayment(Guid BetId)
         {
-           return GenerateUrl(paySystem);
+            var bet = _Betrepository.FirstOrDefault(x => x.Id == BetId);
+           var paySystemId = _Betrepository.FirstOrDefault(x => x.Id == BetId).PaySystemId;
+            var paySystem = _paySystemRepository.FirstOrDefault(x => x.Id == paySystemId);
+           return await GenerateUrl(paySystem);
         }
-        public string PayExistingPayment(Guid BetId)
+        public async Task<string> PayExistingPayment(Guid BetId)
         {
             PaySystem paySystem = _Betrepository.Get(BetId).PaySystem;
-            return GenerateUrl(paySystem);
+            return await GenerateUrl(paySystem);
         }
 
         public string Base64Encode(string plainText)
@@ -39,39 +44,35 @@ namespace Penalty.Penalty.PaySystems.Services
             return System.Convert.ToBase64String(plainTextBytes);
         }
 
-        public string GenerateUrl(PaySystem paySystem)
+        public async Task<string> GenerateUrl(PaySystem paySystem)
         {
             var orderId = 1;
             var payments = _paySystemRepository.GetAll();
-            if (payments != null)
+            if (payments.ToList().Count > 0)
             {
-                orderId = payments.Select(x => x.m_orderid).LastOrDefault();
+                try
+                {
+                    orderId = payments.OrderBy(x => x.m_orderid).Select(x => x.m_orderid).LastOrDefault() + 1;
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
             paySystem.m_orderid = orderId;
             paySystem.isCompleted = false;
-            _paySystemRepository.InsertOrUpdate(paySystem);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.Append(paySystem.MerchantUrl);
-            stringBuilder.Append("/?m_shop=");
-            stringBuilder.Append(paySystem.m_shop + "&");
-            stringBuilder.Append("m_orderid=");
-            stringBuilder.Append(paySystem.m_orderid + "&");
-            stringBuilder.Append("m_amount=");
-            stringBuilder.Append(paySystem.m_amount + "&");
-            stringBuilder.Append("m_curr=");
-            stringBuilder.Append(paySystem.m_curr + "&");
-            stringBuilder.Append("m_desc=");
-            stringBuilder.Append(paySystem.m_desc + "&");
-            stringBuilder.Append("m_sign=");
-            var arr = new string[] { paySystem.m_shop.ToString(), paySystem.m_orderid.ToString()
-                , paySystem.m_amount.ToString(), paySystem.m_curr, paySystem.m_desc, paySystem.m_key.ToString() };
-            var newsign = sign_hash(arr);
-            stringBuilder.Append(newsign);
-            stringBuilder.Append("&lang=en");
-            paySystem.sign = newsign;
-            _paySystemRepository.InsertOrUpdateAsync(paySystem);
 
-            return stringBuilder.ToString();
+            var m_shop = paySystem.m_shop.ToString();
+            var m_orderid = paySystem.m_orderid.ToString();
+            var m_amount = paySystem.m_amount.ToString() + ".00" ;
+            var m_curr = "USD";
+            var m_desc = Base64Encode(paySystem.m_desc.ToString());
+            var m_key = paySystem.m_key.ToString();
+            var arr = new string[] { m_shop, m_orderid, m_amount, m_curr, m_desc, m_key };
+            var sign = sign_hash(arr);
+            await _paySystemRepository.InsertOrUpdateAsync(paySystem);
+            return paySystem.MerchantUrl.ToString() + "?m_shop="+ m_shop +"&m_orderid="+ m_orderid +"&m_amount="+ m_amount +"&m_curr=USD&m_desc="+ m_desc +"&m_sign=" + sign +"&lang=en";
+
         }
 
         public string sign_hash(string[] arr)

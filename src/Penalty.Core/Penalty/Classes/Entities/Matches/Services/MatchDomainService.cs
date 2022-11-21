@@ -28,31 +28,37 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
 
         public IList<Match> GetAll()
         {
+            CheckEndings();
             return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).ToList();
         }
 
         public IList<Match> GetAllFinishedMatches()
         {
+            CheckEndings();
             return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).Where(x => x.MatchStatus == Enums.MatchStatus.Finished).ToList();
         }
 
         public async Task<IList<Match>> GetAllMatchesAsync()
         {
+            await CheckEndings();
             return await _repository.GetAllListAsync();
         }
 
         public IList<Match> GetAllNotStartedMatches()
         {
+            CheckEndings();
             return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).Where(x=> x.MatchStatus == Enums.MatchStatus.NotStarted).ToList();
         }
 
         public IList<Match> GetAllPendingMatches()
         {
+            CheckEndings();
             return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).Where(x => x.MatchStatus == Enums.MatchStatus.Pending).ToList();
         }
 
         public async Task<Match> GetbyId(Guid id)
         {
+            CheckEndings();
             return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).FirstOrDefault(x => x.Id == id);
         }
 
@@ -66,6 +72,19 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
             return await _repository.InsertOrUpdateAsync(match);
         }
 
+        public async Task<bool> CheckEndings()
+        {
+          var matches = _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).Where(x => x.MatchStatus == Enums.MatchStatus.NotStarted).ToList();
+            foreach(var match in matches)
+            {
+                if(match.StartingTime < DateTime.Now)
+                {
+                    match.MatchStatus = Enums.MatchStatus.Pending;
+                    await _repository.UpdateAsync(match);
+                }
+            }
+            return true;
+        }
      
     }
 }

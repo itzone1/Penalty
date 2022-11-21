@@ -10,6 +10,7 @@ namespace Penalty.Penalty.PaySystems.Services
 {
     public interface IPaySystemAppService : IApplicationService
     {
-        public string AddNewPayment(CreatePaySystemDto paySystem);
+        public Task<string> AddNewPayment(Guid BetId);
+        
     }
 }

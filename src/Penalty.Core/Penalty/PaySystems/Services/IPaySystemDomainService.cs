@@ -10,10 +10,10 @@ namespace Penalty.Penalty.PaySystems.Services
 {
     public interface IPaySystemDomainService : IDomainService
     {
-        public string AddNewPayment(PaySystem paySystem);
+        public Task<string> AddNewPayment(Guid BetId);
         public string sign_hash(string[] arr);
         public string Base64Encode(string plainText);
-        public string GenerateUrl(PaySystem paySystem);
-        public string PayExistingPayment(Guid BetId);
+        public Task<string> GenerateUrl(PaySystem paySystem);
+        public Task<string> PayExistingPayment(Guid BetId);
     }
 }

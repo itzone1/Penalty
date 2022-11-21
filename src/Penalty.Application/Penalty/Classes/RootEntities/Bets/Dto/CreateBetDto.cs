@@ -15,5 +15,6 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Dto
         public int AwayTeamScore { get; set; }
         public double BetBalance { get; set; }
         public string? Description { get; set; }
+
     }
 }

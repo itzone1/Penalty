@@ -33,5 +33,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Dto
         public DateTime BettingDate { get; set; }
         public int BetStatus { get; set; }
         public string? Description { get; set; }
+        public bool isPaid { get; set; }
+
     }
 }

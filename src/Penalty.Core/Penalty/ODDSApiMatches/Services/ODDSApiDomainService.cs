@@ -64,6 +64,28 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
                     };
                     foreach (var oddsMatch in oDDSMatch)
                     {
+
+                        var HometeamExist = _teamRepository.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam);
+                        if(HometeamExist == null)
+                        {
+                            Team team = new Team()
+                            {
+                                Name = oddsMatch.HomeTeam,
+                                Description = "AutoAdded"
+                            };
+                           await _teamRepository.InsertAsync(team);
+                        }
+                        var AwayteamExist = _teamRepository.FirstOrDefault(x => x.Name == oddsMatch.HomeTeam);
+                        if (AwayteamExist == null)
+                        {
+                            Team team = new Team()
+                            {
+                                Name = oddsMatch.AwayTeam,
+                                Description = "AutoAdded"
+                            };
+                            await _teamRepository.InsertAsync(team);
+                        }
+
                         var resExist = matchReses.Where(x => x.MatchId == Guid.Parse(oddsMatch.Id)).Count() > 0;
                         var match = new Match()
                         {

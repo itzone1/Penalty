@@ -1,4 +1,5 @@
 ﻿using Abp.Domain.Repositories;
+using Abp.EntityFrameworkCore.Repositories;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Penalty.Authorization.Users;
@@ -72,17 +73,28 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
             PaySystem paySystem = new PaySystem()
             {
+                User = bet.User,
+                UserId = bet.UserId,
                 MerchantUrl = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantUrl,
                 m_shop = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantShop,
                 m_key = _generalSettingsRepository.GetAll().FirstOrDefault().MerchantSecretKey,
                 m_amount = bet.BetBalance,
                 m_curr = "USD",
                 m_desc = "",
-                m_orderid = 12345
+                m_orderid = 12345,
+                sign = "",
+                isCompleted = false,
             };
 
-            await _paySystemRepository.InsertAsync(paySystem);
-            bet.PaySystemId = paySystem.Id;
+            var payId = await _paySystemRepository.InsertAndGetIdAsync(paySystem);
+            try
+            {
+                await _paySystemRepository.GetDbContext().SaveChangesAsync();
+            }catch(Exception ex)
+            {
+
+            }
+            bet.PaySystemId = payId;
             bet.PaySystem = paySystem;
 
             return await _repository.InsertAsync(bet);

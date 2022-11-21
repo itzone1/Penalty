@@ -1,5 +1,6 @@
 ﻿using Abp.Domain.Entities.Auditing;
 using Penalty.Authorization.Users;
+using Penalty.Penalty.Classes.RootEntities.Bets;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;

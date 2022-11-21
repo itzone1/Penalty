@@ -24,8 +24,9 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
         private readonly IRepository<GeneralSettings,Guid> _generalSettingsRepository;
         private IAbpSession AbpSession { get; set; }
         private readonly IRepository<InvitedUser, Guid> _InvitedUsersRepository;
+        private readonly IPaySystemDomainService _paySystemDomainService;
 
-        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository, IRepository<InvitedUser, Guid> invitedUsersRepository)
+        public BetDomainService(IRepository<Bet, Guid> repository, UserManager userManager, IAbpSession abpSession, IRepository<PaySystem, Guid> paySystemRepository, IRepository<GeneralSettings, Guid> generalSettingsRepository, IRepository<InvitedUser, Guid> invitedUsersRepository, IPaySystemDomainService paySystemDomainService)
         {
             _repository = repository;
             _userManager = userManager;
@@ -33,6 +34,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             _paySystemRepository = paySystemRepository;
             _generalSettingsRepository = generalSettingsRepository;
             _InvitedUsersRepository = invitedUsersRepository;
+            _paySystemDomainService = paySystemDomainService;
         }
 
         public void Delete(Bet bet)
@@ -42,16 +44,31 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
         public IList<Bet> GetAll()
         {
-            return _repository.GetAllIncluding(x=>x.Match,x=> x.Match.League,x=> x.Match.HomeTeam,x=>x.Match.AwayTeam,x=>x.PayMethod,x=>x.User).ToList();
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach(var bet in bets)
+            {
+                _paySystemDomainService.CheckPayment(bet.Id);
+            }
+            return bets;
         }
 
         public async Task<IList<Bet>> GetAllBetsAsync()
         {
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach (var bet in bets)
+            {
+               await _paySystemDomainService.CheckPayment(bet.Id);
+            }
             return await _repository.GetAllListAsync();
         }
 
         public async Task<Bet> GetbyId(Guid id)
         {
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach (var bet in bets)
+            {
+               await _paySystemDomainService.CheckPayment(bet.Id);
+            }
             return _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).FirstOrDefault(x => x.Id == id);
         }
 
@@ -111,6 +128,11 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
 
         public  IList<Bet> GetUserBets()
         {
+            var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
+            foreach (var bet in bets)
+            {
+                _paySystemDomainService.CheckPayment(bet.Id);
+            }
             return _repository.GetAllIncluding(x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam).Where(x => x.User.Id == AbpSession.UserId).ToList();
         }
     }

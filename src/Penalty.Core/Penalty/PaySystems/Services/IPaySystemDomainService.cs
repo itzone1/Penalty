@@ -15,5 +15,6 @@ namespace Penalty.Penalty.PaySystems.Services
         public string Base64Encode(string plainText);
         public Task<string> GenerateUrl(PaySystem paySystem);
         public Task<string> PayExistingPayment(Guid BetId);
+        public Task<bool> CheckPayment(Guid BetId);
     }
 }

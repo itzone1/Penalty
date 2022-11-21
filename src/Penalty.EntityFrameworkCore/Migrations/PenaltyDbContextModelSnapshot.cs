@@ -1655,6 +1655,9 @@ namespace Penalty.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("DeservedBalance")
+                        .HasColumnType("float");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -1884,6 +1887,9 @@ namespace Penalty.Migrations
                     b.Property<string>("ApiKey")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ApiPass")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
@@ -1907,6 +1913,12 @@ namespace Penalty.Migrations
 
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("MainAccount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MerchantId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MerchantSecretKey")
                         .HasColumnType("nvarchar(max)");

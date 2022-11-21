@@ -11,6 +11,15 @@ using System.Text;
 using Abp.Domain.Repositories;
 using Penalty.Penalty.Classes.RootEntities.Bets;
 using System.Linq.Dynamic.Core;
+using System.Net.Http;
+using Nito.AsyncEx.Synchronous;
+using System.Net;
+using Penalty.Penalty.Classes.RootEntities;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 
 namespace Penalty.Penalty.PaySystems.Services
 {
@@ -18,11 +27,13 @@ namespace Penalty.Penalty.PaySystems.Services
     {
         private readonly IRepository<PaySystem, Guid> _paySystemRepository;
         private readonly IRepository<Bet, Guid> _Betrepository;
+        private readonly IRepository<GeneralSettings, Guid> _generalSettings;
 
-        public PaySystemDomainService(IRepository<PaySystem, Guid> paySystemRepository, IRepository<Bet, Guid> betrepository)
+        public PaySystemDomainService(IRepository<PaySystem, Guid> paySystemRepository, IRepository<Bet, Guid> betrepository, IRepository<GeneralSettings, Guid> generalSettings)
         {
             _paySystemRepository = paySystemRepository;
             _Betrepository = betrepository;
+            _generalSettings = generalSettings;
         }
 
         public async Task<string> AddNewPayment(Guid BetId)
@@ -30,7 +41,7 @@ namespace Penalty.Penalty.PaySystems.Services
             var bet = _Betrepository.FirstOrDefault(x => x.Id == BetId);
            var paySystemId = _Betrepository.FirstOrDefault(x => x.Id == BetId).PaySystemId;
             var paySystem = _paySystemRepository.FirstOrDefault(x => x.Id == paySystemId);
-           return await GenerateUrl(paySystem);
+            return await GenerateUrl(paySystem);
         }
         public async Task<string> PayExistingPayment(Guid BetId)
         {
@@ -81,6 +92,50 @@ namespace Penalty.Penalty.PaySystems.Services
             byte[] data = Encoding.Default.GetBytes(signdata);
             var result = new SHA256Managed().ComputeHash(data);
             return BitConverter.ToString(result).Replace("-", "").ToUpper();
+        }
+
+        public async Task<bool> CheckPayment(Guid BetId)
+        {
+            var bet = _Betrepository.GetAllIncluding(x => x.PaySystem).FirstOrDefault(x => x.Id == BetId);
+            var paySystemId = _Betrepository.FirstOrDefault(x => x.Id == BetId).PaySystemId;
+            var paySystem = _paySystemRepository.FirstOrDefault(x => x.Id == paySystemId);
+            var settings = _generalSettings.GetAll().FirstOrDefault();
+
+            var cl = new HttpClient();
+            cl.BaseAddress = new Uri("https://payeer.com/ajax/api/api.php");
+            int _TimeoutSec = 90;
+            cl.Timeout = new TimeSpan(0, 0, _TimeoutSec);
+            string _ContentType = "application/form-data";
+            cl.DefaultRequestHeaders.Add("merchantId", settings.MerchantId);
+            cl.DefaultRequestHeaders.Add("account", settings.MainAccount);
+            cl.DefaultRequestHeaders.Add("apiId", settings.ApiKey);
+            cl.DefaultRequestHeaders.Add("apiPass", settings.ApiPass);
+            cl.DefaultRequestHeaders.Add("action", "paymentDetails");
+            cl.DefaultRequestHeaders.Add("referenceId", paySystem.m_orderid.ToString());
+            cl.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_ContentType));
+            var _UserAgent = "d-fens HttpClient";
+            cl.DefaultRequestHeaders.Add("User-Agent", _UserAgent);
+
+            var nvc = new List<KeyValuePair<string, string>>();
+            nvc.Add(new KeyValuePair<string, string>("key of content", "value"));
+            nvc.Add(new KeyValuePair<string, string>("merchantId", settings.MerchantId));
+            nvc.Add(new KeyValuePair<string, string>("account", settings.MainAccount));
+            nvc.Add(new KeyValuePair<string, string>("apiId", settings.ApiKey));
+            nvc.Add(new KeyValuePair<string, string>("apiPass", settings.ApiPass));
+            nvc.Add(new KeyValuePair<string, string>("action", "paymentDetails"));
+            nvc.Add(new KeyValuePair<string, string>("referenceId", paySystem.m_orderid.ToString()));
+            var req = new HttpRequestMessage(HttpMethod.Post, "https://payeer.com/ajax/api/api.php") { Content = new FormUrlEncodedContent(nvc) };
+            var res = cl.SendAsync(req).Result.Content.ReadAsStringAsync();
+
+            dynamic data = JObject.Parse(res.Result);
+            bool success = data.success;
+            if(success == true)
+            {
+                paySystem.isCompleted = true;
+                await _paySystemRepository.UpdateAsync(paySystem);
+                return true;
+            }
+            return false;
         }
     }
 }

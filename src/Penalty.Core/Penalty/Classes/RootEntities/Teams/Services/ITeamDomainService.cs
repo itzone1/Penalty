@@ -14,6 +14,6 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
         Task<Team> GetbyId(Guid id);
         Task<Team> Insert(Team team);
         Task<Team> Update(Team team);
-        void Delete(Team team);
+        void Delete(Guid id);
     }
 }

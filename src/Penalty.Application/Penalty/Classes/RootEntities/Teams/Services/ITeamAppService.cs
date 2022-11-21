@@ -16,7 +16,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
         Task<TeamDto> GetbyId(Guid id);
         Task<CreateTeamDto> Insert(CreateTeamDto teamdto);
         Task<UpdateTeamDto> Update(UpdateTeamDto teamdto);
-        void Delete(TeamDto teamdto);
+        void Delete(Guid id);
         [HttpGet]
         Task BackGroundWorker();
     }

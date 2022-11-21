@@ -25,10 +25,9 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
         }
 
         [AbpAuthorize(PermissionNames.Pages_Users_Activation)]
-        public void Delete(TeamDto teamdto)
+        public void Delete(Guid id)
         {
-            var team = ObjectMapper.Map<Team>(teamdto);
-            _teamDomainService.Delete(team);
+            _teamDomainService.Delete(id);
         }
         public IList<TeamDto> GetAll()
         {

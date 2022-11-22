@@ -49,6 +49,13 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             {
                 _paySystemDomainService.CheckPayment(bet.Id);
             }
+            foreach (var bet in bets)
+            {
+                if (!bet.isPaid && bet.Match.MatchStatus != Enums.MatchStatus.NotStarted)
+                {
+                     _repository.Delete(bet);
+                }
+            }
             return bets;
         }
 
@@ -58,6 +65,10 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             foreach (var bet in bets)
             {
                await _paySystemDomainService.CheckPayment(bet.Id);
+                if (!bet.isPaid && bet.Match.MatchStatus != Enums.MatchStatus.NotStarted)
+                {
+                    await _repository.DeleteAsync(bet);
+                }
             }
             return await _repository.GetAllListAsync();
         }
@@ -68,6 +79,10 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             foreach (var bet in bets)
             {
                await _paySystemDomainService.CheckPayment(bet.Id);
+                if(!bet.isPaid && bet.Match.MatchStatus != Enums.MatchStatus.NotStarted)
+                {
+                   await _repository.DeleteAsync(bet);
+                }
             }
             return _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).FirstOrDefault(x => x.Id == id);
         }
@@ -126,14 +141,22 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             return await _repository.InsertOrUpdateAsync(bet);
         }
 
-        public  IList<Bet> GetUserBets()
+        public  async Task<IList<Bet>> GetUserBets()
         {
             var bets = _repository.GetAllIncluding(x => x.Match, x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam, x => x.PayMethod, x => x.User).ToList();
             foreach (var bet in bets)
             {
-                _paySystemDomainService.CheckPayment(bet.Id);
+               await _paySystemDomainService.CheckPayment(bet.Id);
             }
-            return _repository.GetAllIncluding(x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam).Where(x => x.User.Id == AbpSession.UserId).ToList();
+            foreach (var bet in bets)
+            {
+                if (!bet.isPaid && bet.Match.MatchStatus != Enums.MatchStatus.NotStarted)
+                {
+                    _repository.Delete(bet);
+                }
+            }
+           
+            return  _repository.GetAllIncluding(x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam).Where(x => x.User.Id == AbpSession.UserId).ToList();
         }
     }
 }

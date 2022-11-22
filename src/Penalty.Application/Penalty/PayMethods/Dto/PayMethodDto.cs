@@ -9,5 +9,8 @@ namespace Penalty.Penalty.PayMethods.Dto
 {
     public class PayMethodDto : EntityDto<Guid>
     {
+        public long UserId { get; set; }
+        public bool isActive { get; set; }
+        public string AccountNumber { get; set; }
     }
 }

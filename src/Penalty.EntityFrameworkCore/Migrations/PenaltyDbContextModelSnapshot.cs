@@ -2254,9 +2254,6 @@ namespace Penalty.Migrations
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("SecretKey")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
@@ -2267,7 +2264,7 @@ namespace Penalty.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PayMethod");
+                    b.ToTable("PayMethods");
                 });
 
             modelBuilder.Entity("Penalty.Penalty.PaySystems.PaySystem", b =>

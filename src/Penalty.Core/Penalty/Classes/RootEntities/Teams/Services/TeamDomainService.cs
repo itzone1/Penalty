@@ -18,7 +18,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Teams.Services
             _repository = repository;
         }
 
-        public void Delete(Guid id)
+        public void Delete(Guid id)     
         {
            _repository.Delete(id);
         }

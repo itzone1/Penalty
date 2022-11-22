@@ -30,8 +30,7 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
                 try
                 {
 
-                   // var response = httpclient.GetAsync("https://fb5f-37-48-147-172.ngrok.io/api/services/app/Team/BackGroundWorker");
-                    var response = httpclient.GetAsync("https://localhost:44311/api/services/app/Team/BackGroundWorker");
+                    var response = httpclient.GetAsync("http://penalty-bet.com:81/api/services/app/Team/BackGroundWorker");
                     var result = response.WaitAndUnwrapException();
                 }
                 catch (Exception ex)

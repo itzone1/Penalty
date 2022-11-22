@@ -22,5 +22,10 @@ namespace Penalty.Penalty.PaySystems.Services
             var createdUrl = await _paySystemDomainService.AddNewPayment(BetId);
             return createdUrl;
         }
+        public IList<PaySystemDto> GetAll()
+        { 
+            var list = _paySystemDomainService.GetAll();
+            return ObjectMapper.Map<List<PaySystemDto>>(list);
+        }
     }
 }

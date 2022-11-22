@@ -30,7 +30,7 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
                 try
                 {
 
-                    var response = httpclient.GetAsync("http://penalty-bet.com:81/api/services/app/Team/BackGroundWorker");
+                    var response = httpclient.GetAsync("http://localhost:81/api/services/app/Team/BackGroundWorker");
                     var result = response.WaitAndUnwrapException();
                 }
                 catch (Exception ex)

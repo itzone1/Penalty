@@ -35,6 +35,11 @@ namespace Penalty.Penalty.PaySystems.Services
             _Betrepository = betrepository;
             _generalSettings = generalSettings;
         }
+        public IList<PaySystem> GetAll()
+        {
+            var pays = _paySystemRepository.GetAllIncluding(x=>x.User).ToList();
+            return pays;
+        }
 
         public async Task<string> AddNewPayment(Guid BetId)
         {

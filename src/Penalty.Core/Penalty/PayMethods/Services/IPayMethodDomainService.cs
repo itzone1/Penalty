@@ -15,7 +15,7 @@ namespace Penalty.Penalty.PayMethods.Services
         Task<PayMethod> GetbyId(Guid id);
         Task<PayMethod> Insert(PayMethod payMethod);
         Task<PayMethod> Update(PayMethod payMethod);
-        void Delete(PayMethod payMethod);
+        void Delete(Guid id);
         Task<PayMethod> CheckAccount(PayMethod payMethod);
 
     }

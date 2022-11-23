@@ -23,9 +23,9 @@ namespace Penalty.Penalty.PayMethods.Services
             AbpSession = abpSession;
         }
 
-        public void Delete(PayMethod payMethod)
+        public void Delete(Guid id)
         {
-          _repository.Delete(payMethod);
+          _repository.Delete(id);
         }
 
         public IList<PayMethod> GetAll()
@@ -45,6 +45,12 @@ namespace Penalty.Penalty.PayMethods.Services
 
         public async Task<PayMethod> Insert(PayMethod payMethod)
         {
+            var Exist = _repository.GetAllIncluding(x => x.User).Where(x => x.UserId == AbpSession.UserId).FirstOrDefault();
+            if(Exist != null)
+            {
+                Exist.AccountNumber = payMethod.AccountNumber;
+                return await _repository.UpdateAsync(Exist);
+            }
             if (AbpSession.UserId != null)
             {
                 payMethod.User = _userManager.GetUserById((long)AbpSession.UserId);

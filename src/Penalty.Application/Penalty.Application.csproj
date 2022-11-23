@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="Penalty\Classes\RootEntities\Bets\Map\" />
     <Folder Include="Penalty\PayMethods\Map\" />
-    <Folder Include="Penalty\PayMethods\Services\" />
     <Folder Include="Penalty\PaySystems\Map\" />
   </ItemGroup>
 </Project>

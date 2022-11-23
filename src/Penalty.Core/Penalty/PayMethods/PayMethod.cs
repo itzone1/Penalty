@@ -16,6 +16,5 @@ namespace Penalty.Penalty.PayMethods
         public User User { get; set; }
         public bool isActive { get; set; }
         public string AccountNumber { get; set; }
-        public string SecretKey { get; set; }
     }
 }

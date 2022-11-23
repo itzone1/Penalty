@@ -17,6 +17,7 @@ using Abp.Domain.Repositories;
 using Penalty.Penalty.PaySystems;
 using Penalty.Penalty.InvitationLinks;
 using Penalty.Penalty.InvitedUsers;
+using Penalty.Penalty.PayMethods;
 
 namespace Penalty.EntityFrameworkCore
 {
@@ -32,6 +33,7 @@ namespace Penalty.EntityFrameworkCore
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<PaySystem> PaySystems { get; set; }
+        public DbSet<PayMethod> PayMethods { get; set; }
         public DbSet<LeagueType> LeagueTypes { get; set; }
         public DbSet<Bet> Bets { get; set; }
         public DbSet<GeneralSettings> GeneralSettings { get; set; }

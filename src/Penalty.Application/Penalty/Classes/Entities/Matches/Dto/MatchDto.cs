@@ -1,4 +1,5 @@
 ﻿using Abp.Application.Services.Dto;
+using Penalty.Penalty.Classes.Entities.MatchResults.Dto;
 using Penalty.Penalty.Classes.RootEntities.Leagues;
 using Penalty.Penalty.Classes.RootEntities.Leagues.Dto;
 using Penalty.Penalty.Classes.RootEntities.Teams;
@@ -17,6 +18,7 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Dto
         public string Name { get; set; }
         public Guid LeagueId { get; set; }
         public LeagueDto League { get; set; }
+        public MatchResultDto? MatchResult { get; set; }
         public Guid HomeTeamId { get; set; }
         public TeamDto HomeTeam { get; set; }
         public Guid AwayTeamId { get; set; }

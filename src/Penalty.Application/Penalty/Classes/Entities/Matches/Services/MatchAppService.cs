@@ -13,6 +13,8 @@ using Penalty.Penalty.Classes.RootEntities.Teams.Services;
 using Penalty.Penalty.Classes.RootEntities.Leagues.Services;
 using Penalty.Penalty.Classes.RootEntities.Leagues.Dto;
 using Penalty.Penalty.Classes.RootEntities.Leagues;
+using Penalty.Penalty.Classes.Entities.MatchResults.Services;
+using Penalty.Penalty.Classes.Entities.MatchResults.Dto;
 
 namespace Penalty.Penalty.Classes.Entities.Matches.Services
 {
@@ -21,12 +23,14 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
         private readonly IMatchDomainService _matchDomainService;
         private readonly ITeamDomainService _teamDomainService;
         private readonly ILeagueDomainService _leagueDomainService;
+        private readonly IMatchResultDomainService _matchResultDomainService;
 
-        public MatchAppService(IMatchDomainService matchDomainService, ITeamDomainService teamDomainService, ILeagueDomainService leagueDomainService)
+        public MatchAppService(IMatchDomainService matchDomainService, ITeamDomainService teamDomainService, ILeagueDomainService leagueDomainService, IMatchResultDomainService matchResultDomainService)
         {
             _matchDomainService = matchDomainService;
             _teamDomainService = teamDomainService;
             _leagueDomainService = leagueDomainService;
+            _matchResultDomainService = matchResultDomainService;
         }
         [AbpAuthorize(PermissionNames.Pages_Users_Activation)]
         public void Delete(Guid id)
@@ -56,7 +60,13 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
         public IList<MatchDto> GetAll()
         {
             var matches = _matchDomainService.GetAll();
-            return ObjectMapper.Map<List<MatchDto>>(matches);
+            var dtos = ObjectMapper.Map<List<MatchDto>>(matches);
+            foreach(var dto in dtos)
+            {
+                var result = _matchResultDomainService.GetAll().FirstOrDefault(x => x.MatchId == dto.Id);
+                dto.MatchResult = ObjectMapper.Map<MatchResultDto>(result);
+            }
+            return dtos;
         }
 
         public IList<MatchDto> GetAllFinishedMatches()

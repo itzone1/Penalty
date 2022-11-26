@@ -59,7 +59,7 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
 
         public IList<MatchDto> GetAll()
         {
-            var matches = _matchDomainService.GetAll();
+            var matches = _matchDomainService.GetAll().OrderByDescending(x=>x.MatchDate);
             var dtos = ObjectMapper.Map<List<MatchDto>>(matches);
             foreach(var dto in dtos)
             {
@@ -71,25 +71,25 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
 
         public IList<MatchDto> GetAllFinishedMatches()
         {
-            var matches = _matchDomainService.GetAllFinishedMatches();
+            var matches = _matchDomainService.GetAllFinishedMatches().OrderByDescending(x => x.MatchDate);
             return ObjectMapper.Map<List<MatchDto>>(matches);
         }
 
         public async Task<IList<MatchDto>> GetAllMatchesAsync()
         {
-            var matches = await _matchDomainService.GetAllMatchesAsync();
+            var matches = (await _matchDomainService.GetAllMatchesAsync()).OrderByDescending(x => x.MatchDate);
             return ObjectMapper.Map<List<MatchDto>>(matches);
         }
 
         public IList<MatchDto> GetAllNotStartedMatches()
         {
-            var matches = _matchDomainService.GetAllNotStartedMatches();
+            var matches = _matchDomainService.GetAllNotStartedMatches().OrderByDescending(x => x.MatchDate);
             return ObjectMapper.Map<List<MatchDto>>(matches);
         }
 
         public IList<MatchDto> GetAllPendingMatches()
         {
-            var matches = _matchDomainService.GetAllPendingMatches();
+            var matches = _matchDomainService.GetAllPendingMatches().OrderByDescending(x => x.MatchDate);
             return ObjectMapper.Map<List<MatchDto>>(matches);
         }
 

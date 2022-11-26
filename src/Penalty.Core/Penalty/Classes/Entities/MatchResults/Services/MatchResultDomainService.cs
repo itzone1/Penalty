@@ -126,7 +126,7 @@ namespace Penalty.Penalty.Classes.Entities.MatchResults.Services
             double newODD = 0;
             var ODDsettings = _GeneralSettingsrepository.GetAll().Select(x => x.DefaultODD).FirstOrDefault();
             int numberOfInvitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)abpSession.UserId).Count();
-            newODD = match.ODD + (ODDsettings * numberOfInvitedUsers);
+            newODD = match.ODD + (match.ODD*(ODDsettings * numberOfInvitedUsers))/100;
             return newODD;
         }
     }

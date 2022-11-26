@@ -126,6 +126,8 @@ namespace Penalty.Penalty.ODDSApiMatches.Services
                                 AwayTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.AwayTeam).TeamScore),
                                 HomeTeamScore = Convert.ToInt32(oddsMatch.Scores.FirstOrDefault(x => x.TeamName == oddsMatch.HomeTeam).TeamScore),
                                 Match = match,
+                                MatchEndingDate = match.MatchDate,
+                                MatchEndingTime = oddsMatch.CommenceTime.AddMinutes(105)
                             };
                             await _MatchResultrepository.InsertAsync(matchRes);
                         }

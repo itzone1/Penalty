@@ -67,5 +67,11 @@ namespace Penalty.Penalty.PayMethods.Services
         {
             throw new NotImplementedException();
         }
+
+        public async Task<string> GetAccountNumberbyUser()
+        {
+            var Exist =  _repository.GetAllIncluding(x => x.User).Where(x => x.UserId == AbpSession.UserId).FirstOrDefault();
+            return Exist.AccountNumber.ToString();
+        }
     }
 }

@@ -17,5 +17,6 @@ namespace Penalty.Penalty.PayMethods.Services
         Task<PayMethodDto> Update(PayMethodDto payMethodDto);
         void Delete(Guid id);
         Task<PayMethodDto> CheckAccount(PayMethodDto payMethodDto);
+        Task<string> GetAccountNumberbyUser();
     }
 }

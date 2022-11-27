@@ -13,6 +13,7 @@ namespace Penalty.Penalty.PayMethods.Services
         IList<PayMethod> GetAll();
         Task<IList<PayMethod>> GetAllPayMethodsAsync();
         Task<PayMethod> GetbyId(Guid id);
+        Task<string> GetAccountNumberbyUser();
         Task<PayMethod> Insert(PayMethod payMethod);
         Task<PayMethod> Update(PayMethod payMethod);
         void Delete(Guid id);

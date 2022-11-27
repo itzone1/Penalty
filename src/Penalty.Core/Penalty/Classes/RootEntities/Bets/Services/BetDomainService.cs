@@ -155,8 +155,8 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
                     _repository.Delete(bet);
                 }
             }
-           
-            return  _repository.GetAllIncluding(x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam).Where(x => x.User.Id == AbpSession.UserId).ToList();
+           var allbets = _repository.GetAllIncluding(x => x.Match.League, x => x.Match.HomeTeam, x => x.Match.AwayTeam).Where(x => x.User.Id == AbpSession.UserId).ToList();
+            return allbets;
         }
     }
 }

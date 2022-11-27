@@ -11,7 +11,7 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
     public interface IMatchDomainService : IDomainService
     {
         IList<Match> GetAll();
-        IList<Match> GetAllNotStartedMatches();
+        Task<IList<Match>> GetAllNotStartedMatches();
         IList<Match> GetAllPendingMatches();
         IList<Match> GetAllFinishedMatches();
         Task<IList<Match>> GetAllMatchesAsync();

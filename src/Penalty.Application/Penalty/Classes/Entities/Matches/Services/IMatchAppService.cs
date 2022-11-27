@@ -13,7 +13,7 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
     public interface IMatchAppService : IApplicationService
     {
         IList<MatchDto> GetAll();
-        IList<MatchDto> GetAllNotStartedMatches();
+        Task<IList<MatchDto>> GetAllNotStartedMatches();
         IList<MatchDto> GetAllPendingMatches();
         IList<MatchDto> GetAllFinishedMatches();
         Task<IList<MatchDto>> GetAllMatchesAsync();

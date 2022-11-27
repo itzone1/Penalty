@@ -1890,11 +1890,17 @@ namespace Penalty.Migrations
                     b.Property<string>("ApiPass")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("BalancePerUser")
+                        .HasColumnType("float");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
                     b.Property<long?>("CreatorUserId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("DefaultCurrency")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("DefaultODD")
                         .HasColumnType("float");
@@ -2214,6 +2220,9 @@ namespace Penalty.Migrations
 
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("PaidForUser")
+                        .HasColumnType("bit");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");

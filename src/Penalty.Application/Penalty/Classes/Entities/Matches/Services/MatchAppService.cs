@@ -81,9 +81,9 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
             return ObjectMapper.Map<List<MatchDto>>(matches);
         }
 
-        public IList<MatchDto> GetAllNotStartedMatches()
+        public async Task<IList<MatchDto>> GetAllNotStartedMatches()
         {
-            var matches = _matchDomainService.GetAllNotStartedMatches().OrderByDescending(x => x.MatchDate);
+            var matches = await _matchDomainService.GetAllNotStartedMatches();
             return ObjectMapper.Map<List<MatchDto>>(matches);
         }
 

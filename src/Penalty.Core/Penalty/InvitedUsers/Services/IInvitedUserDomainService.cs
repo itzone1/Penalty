@@ -11,5 +11,7 @@ namespace Penalty.Penalty.InvitedUsers.Services
     public interface IInvitedUserDomainService : IDomainService
     {
         public Task<InvitedUser> RegisterNewInvitedUser(string name, string surname, string emailAddress, string userName, string plainPassword, long inviterId);
+        public Task<double> GetUserDeservedBalance(long UserId);
+        public Task<bool> PayForUserInvitations(long UserId,double Balance);
     }
 }

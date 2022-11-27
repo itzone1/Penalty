@@ -44,10 +44,10 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
             return await _repository.GetAllListAsync();
         }
 
-        public IList<Match> GetAllNotStartedMatches()
+        public async Task<IList<Match>> GetAllNotStartedMatches()
         {
-            CheckEndings();
-            return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).Where(x=> x.MatchStatus == Enums.MatchStatus.NotStarted).ToList();
+            await CheckEndings();
+            return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).Where(x=> x.MatchStatus == Enums.MatchStatus.NotStarted).OrderByDescending(x => x.MatchDate).ToList();
         }
 
         public IList<Match> GetAllPendingMatches()
@@ -58,7 +58,7 @@ namespace Penalty.Penalty.Classes.Entities.Matches.Services
 
         public async Task<Match> GetbyId(Guid id)
         {
-            CheckEndings();
+            await CheckEndings();
             return _repository.GetAllIncluding(x => x.League, x => x.HomeTeam.Country, x => x.AwayTeam.Club).FirstOrDefault(x => x.Id == id);
         }
 

@@ -106,14 +106,15 @@ namespace Penalty.Penalty.Classes.Entities.MatchResults.Services
                 betResult.BetId = bet.Id;
                 betResult.MatchResult = matchResult;
                 betResult.MatchResultId = matchResult.Id;
-                betResult.DeservedBalance = bet.BetBalance *  GetDeservableODD(matchResult.Match);
                 if(isWon)
                 {
                     betResult.Result = Enums.Result.WonBet;
+                    betResult.DeservedBalance = bet.BetBalance * GetDeservableODD(matchResult.Match) / 100;
                 }
                 else
                 {
                     betResult.Result = Enums.Result.LostBet;
+                    betResult.DeservedBalance = bet.BetBalance;
                 }
                 bet.BetStatus = Enums.BetStatus.Finished;
                 await _betDomainService.Update(bet);
@@ -124,9 +125,10 @@ namespace Penalty.Penalty.Classes.Entities.MatchResults.Services
         private double GetDeservableODD(Match match)
         {
             double newODD = 0;
-            var ODDsettings = _GeneralSettingsrepository.GetAll().Select(x => x.DefaultODD).FirstOrDefault();
-            int numberOfInvitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)abpSession.UserId).Count();
-            newODD = match.ODD + (match.ODD*(ODDsettings * numberOfInvitedUsers))/100;
+            //var ODDsettings = _GeneralSettingsrepository.GetAll().Select(x => x.DefaultODD).FirstOrDefault();
+            //int numberOfInvitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)abpSession.UserId).Count();
+            //newODD = match.ODD + (match.ODD*(ODDsettings * numberOfInvitedUsers))/100;
+            newODD = match.ODD;
             return newODD;
         }
     }

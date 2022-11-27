@@ -18,5 +18,6 @@ namespace Penalty.Penalty.Classes.Entities.BetResults.Services
         Task<BetResult> Update(BetResult betResult);
         void Delete(BetResult betResult);
         Task<BetResult> GetBetResultbyBetId(Guid id);
+        Task<bool> PayForUserBet(Guid BetResultId, double Balance);
     }
 }

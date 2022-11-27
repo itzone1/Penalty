@@ -90,10 +90,10 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
         public async Task<Bet> Insert(Bet bet)
         {
             var currentUser = _userManager.GetUserById((long)AbpSession.UserId);
-            var isInvited = _InvitedUsersRepository.GetAllIncluding(x => x.User).FirstOrDefault(x => x.UserId == currentUser.Id && x.isActivated == false) ;
+            var isInvited = _InvitedUsersRepository.GetAllIncluding(x => x.User).FirstOrDefault(x => x.UserId == currentUser.Id && x.IsActivated == false) ;
             if (isInvited != null)
             {
-                isInvited.isActivated = true;
+                isInvited.IsActivated = true;
                 await _InvitedUsersRepository.UpdateAsync(isInvited);
             }
             bet.BettingDate = DateTime.Now;

@@ -53,7 +53,7 @@ namespace Penalty.Penalty.InvitedUsers.Services
                 UserId = user.Id,
                 InvitedByUser = _userManager.GetUserById(inviterId),
                 InvitedByUserId = inviterId,
-                isActivated = false
+                IsActivated = false
             };
             return await _repository.InsertOrUpdateAsync(invitedUser);
         }

@@ -27,7 +27,7 @@ namespace Penalty.Penalty.Classes.Entities.BetResults
             //    return Bet.BetBalance * Bet.Match.ODD;
             //}
         }
-        public bool isPaid { get; set; }
+        public bool IsPaid { get; set; }
         public string? Description { get; set; }
     }
 }

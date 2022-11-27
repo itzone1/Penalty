@@ -17,6 +17,7 @@ namespace Penalty.Penalty.InvitedUsers
         [ForeignKey("InvitedByUser")]
         public long InvitedByUserId { get; set; }
         public User InvitedByUser { get; set; }
-        public bool isActivated { get; set; }
+        public bool IsActivated { get; set; }
+        public bool IsPaid { get; set; }
     }
 }

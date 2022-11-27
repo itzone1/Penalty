@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Penalty.Penalty.PendingPayments
 {
-    internal class PendingPaymentAppService
+    public class PendingPaymentAppService : PenaltyAppServiceBase, IPendingPaymentAppService
     {
+        public PendingPaymentAppService()
+        {
+
+        }
+
     }
 }

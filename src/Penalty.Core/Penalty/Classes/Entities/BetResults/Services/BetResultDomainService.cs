@@ -120,5 +120,11 @@ namespace Penalty.Penalty.Classes.Entities.BetResults.Services
             }
             return false;
         }
+
+        public async Task<IList<BetResult>> GetAllNotPaidBetResults()
+        {
+            var bets = _repository.GetAllIncluding(x => x.Bet.Match.League, x => x.Bet.Match.HomeTeam, x => x.Bet.Match.AwayTeam, x => x.Bet.User).Where(x => x.IsPaid == false).ToList();
+            return bets;
+        }
     }
 }

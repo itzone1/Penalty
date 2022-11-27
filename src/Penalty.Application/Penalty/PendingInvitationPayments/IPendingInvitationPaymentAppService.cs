@@ -9,5 +9,7 @@ namespace Penalty.Penalty.PendingInvitationPayments
 {
     public interface IPendingInvitationPaymentAppService : IApplicationService
     {
+        public Task<double> GetUserDeservedBalance(long UserId);
+        public Task<bool> PayForUserInvitations(long UserId, double Balance);
     }
 }

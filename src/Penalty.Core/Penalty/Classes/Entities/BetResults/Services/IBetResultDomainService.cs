@@ -13,6 +13,7 @@ namespace Penalty.Penalty.Classes.Entities.BetResults.Services
         IList<BetResult> GetAll();
         IList<BetResult> GetAllUserBets();
         Task<IList<BetResult>> GetAllBetResultsAsync();
+        Task<IList<BetResult>> GetAllNotPaidBetResults();
         Task<BetResult> GetbyId(Guid id);
         Task<BetResult> Insert(BetResult betResult);
         Task<BetResult> Update(BetResult betResult);

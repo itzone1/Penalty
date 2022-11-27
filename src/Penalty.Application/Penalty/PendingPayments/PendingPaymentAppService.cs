@@ -11,23 +11,44 @@ namespace Penalty.Penalty.PendingPayments
 {
     public class PendingPaymentAppService : PenaltyAppServiceBase, IPendingPaymentAppService
     {
-        private readonly IBetResultDomainService betResultDomainService;
+        private readonly IBetResultDomainService _betResultDomainService;
+        private readonly IBetDomainService _betDomainService;
 
-        public PendingPaymentAppService(IBetResultDomainService betResultDomainService)
+        public PendingPaymentAppService(IBetResultDomainService betResultDomainService, IBetDomainService betDomainService)
         {
-            this.betResultDomainService = betResultDomainService;
+            this._betResultDomainService = betResultDomainService;
+            _betDomainService = betDomainService;
+        }
+
+        public async Task<IList<PendingPaymentDto>> GetAllAsync()
+        {
+            var items = _betResultDomainService.GetAll().Where(x => x.IsPaid == false && x.Result == Enums.Result.WonBet);
+            var bets = _betDomainService.GetAll();
+            var result = new List<PendingPaymentDto>();
+            foreach (var item in items)
+            {
+                result.Add(new PendingPaymentDto()
+                {
+                    User = bets.FirstOrDefault(x => x.Id == item.BetId).User.FullName,
+                    HomeTeam = bets.FirstOrDefault(x => x.Id == item.BetId).Match.HomeTeam,
+                    AwayTeam = bets.FirstOrDefault(x => x.Id == item.BetId).Match.AwayTeam,
+                    BetBalance = bets.FirstOrDefault(x => x.Id == item.BetId).BetBalance,
+                    DeservedBalance = item.DeservedBalance,
+                });
+            }
+            return result;
         }
 
         public async Task<IList<BetResultDto>> GetAllNotPaidBetResults()
         {
-            var bets = await betResultDomainService.GetAllNotPaidBetResults();
+            var bets = await _betResultDomainService.GetAllNotPaidBetResults();
             var betsDto = ObjectMapper.Map<IList<BetResultDto>>(bets);
             return betsDto;
         }
 
         public async Task<bool> PayForUserBet(Guid BetResultId, double Balance)
         {
-            return await betResultDomainService.PayForUserBet(BetResultId, Balance);
+            return await _betResultDomainService.PayForUserBet(BetResultId, Balance);
         }
     }
 }

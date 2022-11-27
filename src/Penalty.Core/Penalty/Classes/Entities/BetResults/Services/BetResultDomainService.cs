@@ -114,7 +114,7 @@ namespace Penalty.Penalty.Classes.Entities.BetResults.Services
             bool success = data.success;
             if (success == true)
             {
-                betResult.isPaid = true;
+                betResult.IsPaid = true;
                 await _repository.UpdateAsync(betResult);
                 return true;
             }

@@ -65,12 +65,8 @@ namespace Penalty.Penalty.InvitedUsers.Services
                 UserId = user.Id,
                 InvitedByUser = _userManager.GetUserById(inviterId),
                 InvitedByUserId = inviterId,
-<<<<<<< Updated upstream
-                IsActivated = false
-=======
-                isActivated = false,
-                PaidForUser = false,
->>>>>>> Stashed changes
+                IsActivated = false,
+                IsPaid = false,
             };
             return await _repository.InsertOrUpdateAsync(invitedUser);
         }
@@ -78,7 +74,7 @@ namespace Penalty.Penalty.InvitedUsers.Services
         public async Task<double> GetUserDeservedBalance(long UserId)
         {
             var settings = _settings.GetAll().FirstOrDefault();
-            var invitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)AbpSession.UserId && x.isActivated == false && x.PaidForUser == false);
+            var invitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)AbpSession.UserId && x.IsActivated == false && x.IsPaid == false);
             double balance = 0;
             foreach (var user in invitedUsers)
             {
@@ -125,10 +121,10 @@ namespace Penalty.Penalty.InvitedUsers.Services
             bool success = data.success;
             if (success == true)
             {
-                var invitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)AbpSession.UserId && x.isActivated == false && x.PaidForUser == false);
+                var invitedUsers = _InvitedRepository.GetAllIncluding(x => x.User).Where(x => x.InvitedByUserId == (long)AbpSession.UserId && x.IsActivated == false && x.IsPaid == false);
                 foreach (var user in invitedUsers)
                 {
-                    user.PaidForUser = true;
+                    user.IsPaid = true;
                     await _InvitedRepository.UpdateAsync(user);
                 }
                 return true;

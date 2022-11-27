@@ -30,6 +30,12 @@ namespace Penalty.Penalty.PayMethods.Services
            // var payMethod = ObjectMapper.Map<PayMethod>(id);
             _domainService.Delete(id);
         }
+
+        public Task<string> GetAccountNumberbyUser()
+        {
+           return _domainService.GetAccountNumberbyUser();
+        }
+
         [AbpAuthorize(PermissionNames.Pages_Users_Activation)]
         public IList<PayMethodDto> GetAll()
         {

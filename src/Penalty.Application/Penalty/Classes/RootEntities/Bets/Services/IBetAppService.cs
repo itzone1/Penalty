@@ -12,7 +12,7 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
     public interface IBetAppService : IApplicationService
     {
         IList<BetDto> GetAll();
-        IList<BetDto> GetUserBets();
+        Task<IList<BetDto>> GetUserBets();
         Task<IList<BetDto>> GetAllBetsAsync();
         Task<BetDto> GetbyId(Guid id);
         Task<CreateBetDto> Insert(CreateBetDto betDto);

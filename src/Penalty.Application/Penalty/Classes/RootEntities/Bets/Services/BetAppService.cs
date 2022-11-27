@@ -44,12 +44,11 @@ namespace Penalty.Penalty.Classes.RootEntities.Bets.Services
             return ObjectMapper.Map<BetDto>(bet);
         }
 
-        public IList<BetDto> GetUserBets()
+        public async Task<IList<BetDto>> GetUserBets()
         {
-            var bets = _betDomainService.GetUserBets();
+            var bets = await _betDomainService.GetUserBets();
             return ObjectMapper.Map<List<BetDto>>(bets);
         }
-        [AbpAuthorize(PermissionNames.Pages_Users_Activation)]
         public async Task<CreateBetDto> Insert(CreateBetDto betDto)
         {
             var bet = ObjectMapper.Map<Bet>(betDto);
